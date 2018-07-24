@@ -1,4 +1,6 @@
 import discord
+import requests
+from random import randint
 
 file = open('token.txt', 'r')
 TOKEN = file.read()
@@ -40,6 +42,12 @@ async def on_message(message):
         if flag == False:
             msg = 'Role not found or something else went wrong :shrug:'
             await client.send_message(message.channel, msg)
+
+    if message.content.startswith('!dota random'):
+        r = requests.get('https://api.opendota.com/api/heroes/')
+        rand = randint(0,len(r.json()))
+        msg = """You're going to play {0} a {1} hero with {2} legs""".format(r.json()[rand]["localized_name"],r.json()[rand]["primary_attr"],r.json()[rand]["legs"])
+        await client.send_message(message.channel, msg)
 
     if message.content.startswith('!git'):
         msg = """Source for this bot can be found at:
