@@ -11,9 +11,12 @@ async def on_message(message):
         return
 
     if message.content.startswith('!help'):
-        msg = """This bot can be used to add yourself to various roles based on games. 
-        In order to get full list of games use !list and then get added with !add-<rolename> 
-        For example !add-dota will add you to game-dota role and rights that come with it"""
+        msg = """This bot will help you find people to play games with!
+        Commands: 
+        "!list" shows all available games
+        "!add <game>" adds you to chosen game role
+        "!git" posts a link to the bots source
+        """
         await client.send_message(message.channel, msg)
 
     if message.content.startswith('!list'):
@@ -21,22 +24,27 @@ async def on_message(message):
         for s in client.servers:
             for r in s.roles:
                 if r.name.startswith('Game-'):
-                    l += '{0}\n'.format(r)
+                    l += '{0}\n'.format(r.name[5:])
         await client.send_message(message.channel, l)
 
     if message.content.startswith('!add'):
         flag = False
-        for s in client.servers:
-            for r in s.roles:
-                if r.name.startswith('Game-'):
-                    if str(r.name).lower() == str(message.content[5:]).lower():
-                        await client.add_roles(message.author, r)
-                        msg = 'Added role {0} for user {1}'.format(r, message.author)
+        for server in client.servers:
+            for role in server.roles:
+                if role.name.startswith('Game-'):
+                    if str(role.name[5:]).lower() == str(message.content[5:]).lower():
+                        await client.add_roles(message.author, role)
+                        msg = 'Added role {0} for user {1}'.format(role, message.author)
                         await client.send_message(message.channel, msg)
                         flag = True
         if flag == False:
             msg = 'Role not found or something else went wrong :shrug:'
             await client.send_message(message.channel, msg)
+
+    if message.content.startswith('!git'):
+        msg = """Source for this bot can be found at:
+        https://github.com/ville-solja/kukkohelper"""
+        await client.send_message(message.channel, msg)
 
 @client.event
 async def on_ready():
