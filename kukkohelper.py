@@ -2,16 +2,15 @@ import discord
 import requests
 from random import randint
 
-file = open('token.txt', 'r')
+file = open('/opt/scripts/kukkohelper/token.txt', 'r')
 TOKEN = file.read()
 
 client = discord.Client()
 
-@client.event
+client.event
 async def on_message(message):
     if message.author == client.user:
         return
-
     if message.content.startswith('!help'):
         msg = """This bot will help you find people to play games with!
         Commands: 
@@ -45,7 +44,7 @@ async def on_message(message):
 
     if message.content.startswith('!dota random'):
         r = requests.get('https://api.opendota.com/api/heroes/')
-        rand = randint(0,len(r.json()))
+        rand = randint(0,len(r.json()-1))
         msg = """You're going to play {0} a {1} hero with {2} legs""".format(r.json()[rand]["localized_name"],r.json()[rand]["primary_attr"],r.json()[rand]["legs"])
         await client.send_message(message.channel, msg)
 
