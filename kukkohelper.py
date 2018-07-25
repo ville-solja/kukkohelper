@@ -26,6 +26,7 @@ async def on_message(message):
             Commands: 
             "!list" shows all available games
             "!add <game>" adds you to chosen game role
+            "!dota random" picks a random dota hero
             "!git" posts a link to the bots source
             """
             await client.send_message(message.channel, msg)
