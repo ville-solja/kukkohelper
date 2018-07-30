@@ -7,10 +7,10 @@ from random import randint
 platform = platform.system()
 if platform == 'Windows':
     file = open('token.txt', 'r')
-    log = open('discord_error.log', 'w')
+    log = open('discord_error_kukko.log', 'w')
 elif platform == 'Linux':
     file = open('/opt/scripts/kukkohelper/token.txt', 'r')
-    log = open('/tmp/discord_error.log', 'w')
+    log = open('/tmp/discord_error_kukko.log', 'w')
 
 TOKEN = file.read()
 
