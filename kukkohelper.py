@@ -15,8 +15,8 @@ elif platform == 'Linux':
     key = open('/opt/scripts/kukkohelper/key.txt', 'r')
     log = open('/tmp/discord_error_kukko.log', 'w')
 
-TOKEN = file.read()
-KEY = key.read()
+TOKEN = file.read().strip()
+KEY = key.read().strip()
 
 emoji_checkmark = '✅'
 emoji_stop = '🛑'
