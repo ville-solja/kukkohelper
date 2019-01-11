@@ -22,12 +22,11 @@ emoji_checkmark = '✅'
 emoji_stop = '🛑'
 emoji_thumbup = '👍'
 emoji_thumbdown = '👎'
-emoji_winter = '🎅'
 
 azure_url_ext = "https://northeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=categories,tags,description,adult"
 headers = {
     "Content-Type": "application/json",
-    "Ocp-Apim-Subscription-Key": "cd4fef3d2fc247fda41283e1988f366e"
+    "Ocp-Apim-Subscription-Key": KEY
 }
 client = discord.Client()
 
@@ -50,32 +49,38 @@ async def on_message(message):
         if len(message.attachments) > 0:
             data = {'url': '{0}'.format(message.attachments[0]['url'])}
             r = requests.post(azure_url_ext, json=data, headers=headers)
-            channel = discord.utils.get(message.server.channels, name='nsfw')
-            content = message.attachments[0]['url']
+            nsfwchannel = discord.utils.get(message.server.channels, name='nsfw')
+            origchannel = message.channel
             if r.json()['adult']['isAdultContent'] is True:
-                print('Adult content detected')
-                await client.delete_message(message)
-                msg = 'Message deleted from {0}. Image can be accessed from this link {1}'.format(message.channel, content)
-                print(msg)
-                await client.send_message(channel, msg)
+                if origchannel is not nsfwchannel:
+                    await client.delete_message(message)
+                    msg = 'Image was deleted due to Adultscore: {0}.\nPlease repost to NSFW'.format(r.json()['adult']['adultScore'])
+                    await client.send_message(origchannel, msg)
             else:
-                await client.add_reaction(message, emoji_thumbup)
+                await client.add_reaction(message, emoji_checkmark)
 
         if message.content.startswith('!help'):
             msg = """This bot will help you find people to play games with!
-            Commands: 
+            Commands:
+            "!help" displays this message
             "!list" shows all available games
-            "!add <game>" adds you to chosen game role
+            "!add <role>" adds you to chosen role
+            "!remove <role>" removes role if you have it
             "!dota random" picks a random dota hero
             "!git" posts a link to the bots source
             """
             await client.send_message(message.channel, msg)
 
         if message.content.startswith('!list'):
-            l = 'Here is a list of game roles in this channel\n'
+            l = 'Here is a list of game roles:\n'
             for s in client.servers:
                 for r in s.roles:
                     if r.name.startswith('Game-'):
+                        l += '{0}\n'.format(r.name[5:])
+            l += '\nAnd here is a list of other roles:\n'   
+            for s in client.servers:
+                for r in s.roles:
+                    if r.name.startswith('Role-'):
                         l += '{0}\n'.format(r.name[5:])
             await client.send_message(message.channel, l)
 
@@ -94,8 +99,47 @@ async def on_message(message):
                                 await client.add_roles(user, role)
                                 await client.add_reaction(message, emoji_checkmark)
                                 flag = True
-            if flag == False:
-                msg = 'Role not found or something else went wrong :shrug:'
+                    if role.name.startswith('Role-'):
+                        if str(role.name[5:]).lower() == str(message.content[5:]).lower():
+                            if discord.utils.get(user.roles, id=role.id) is not None:
+                                msg = 'You already have that role!'
+                                await client.send_message(message.channel, msg)
+                                flag = True
+                            else:
+                                await client.add_roles(user, role)
+                                await client.add_reaction(message, emoji_checkmark)
+                                flag = True
+            if flag is False:
+                msg = 'Something went wrong :shrug:'
+                await client.send_message(message.channel, msg)
+
+        if message.content.startswith('!remove'):
+            flag = False
+            user = message.author
+            for server in client.servers:
+                for role in server.roles:
+                    if role.name.startswith('Game-'):
+                        if str(role.name[5:]).lower() == str(message.content[8:]).lower():
+                            if discord.utils.get(user.roles, id=role.id) is not None:
+                                await client.remove_roles(user, role)
+                                await client.add_reaction(message, emoji_checkmark)
+                                flag = True
+                            else:
+                                msg = "You don't have that role!"
+                                await client.send_message(message.channel, msg)
+                                flag = True
+                    if role.name.startswith('Role-'):
+                        if str(role.name[5:]).lower() == str(message.content[8:]).lower():
+                            if discord.utils.get(user.roles, id=role.id) is not None:
+                                await client.remove_roles(user, role)
+                                await client.add_reaction(message, emoji_checkmark)
+                                flag = True
+                            else:
+                                msg = "You don't have that role!"
+                                await client.send_message(message.channel, msg)
+                                flag = True
+            if flag is False:
+                msg = 'Something went wrong :shrug:'
                 await client.send_message(message.channel, msg)
 
         if message.content.startswith('!dota random'):
@@ -116,4 +160,3 @@ async def on_message(message):
 
 
 client.run(TOKEN)
-
