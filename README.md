@@ -4,7 +4,7 @@
 This discord bot is created originally for Kylmät Kukot game groups server in order to implement key features for the community.
 
 ### Streamer notification
-Users that have role Role-Streamer will have bot announce when they start streaming. This 
+Users that have role Role-Streamer will have bot announce when they start streaming.
 
 ## Commands
 ### !help 
