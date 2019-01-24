@@ -5,18 +5,9 @@ import sys
 import random
 from random import randint
 
-platform = platform.system()
-if platform == 'Windows':
-    file = open('token.txt', 'r')
-    key = open('key.txt', 'r')
-    log = open('discord_error_kukko.log', 'w')
-elif platform == 'Linux':
-    file = open('/opt/scripts/kukkohelper/token.txt', 'r')
-    key = open('/opt/scripts/kukkohelper/key.txt', 'r')
-    log = open('/tmp/discord_error_kukko.log', 'w')
-
-TOKEN = file.read().strip()
-KEY = key.read().strip()
+TOKEN = open('TOKEN', 'r').read().strip()
+KEY = open('KEY', 'r').read().strip()
+LOG = open('errors.log', 'w')
 
 emoji_checkmark = '✅'
 emoji_stop = '🛑'
@@ -39,6 +30,21 @@ async def on_ready():
     for each in client.servers:
         print(each.name)
 
+@client.event
+async def on_member_update(before, after):
+    try:
+        after.game.name
+    except AttributeError:
+        e = sys.exc_info()[1]
+        LOG.write(str(e))
+    else:
+        if after.status.value is 'online':
+            if after.game.type is 1:
+                for role in after.roles:
+                    if role.name == 'Role-Streamer':
+                        msg = '{0} presents: "{1}"! <{2}>'.format(after, after.game.name, after.game.url)
+                        general = discord.utils.get(after.server.channels, name='general')
+                        await client.send_message(general, msg)
 
 @client.event
 async def on_message(message):
@@ -156,7 +162,7 @@ async def on_message(message):
             await client.send_message(message.channel, msg)
     except:
         e = sys.exc_info()[1]
-        log.write(str(e))
+        LOG.write(str(e))
 
 
 client.run(TOKEN)
