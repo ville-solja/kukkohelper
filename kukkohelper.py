@@ -39,7 +39,7 @@ async def on_member_update(before, after):
         LOG.write(str(e))
     else:
         if after.status.value is 'online':
-            if after.game.type is 1:
+            if after.game.type is 1 and before.game.type is 0:
                 for role in after.roles:
                     if role.name == 'Role-Streamer':
                         msg = '{0} presents: "{1}"! <{2}>'.format(after, after.game.name, after.game.url)
