@@ -32,19 +32,13 @@ async def on_ready():
 
 @client.event
 async def on_member_update(before, after):
-    try:
-        after.game.name
-    except AttributeError:
-        e = sys.exc_info()[1]
-        LOG.write(str(e))
-    else:
-        if after.status.value is 'online':
-            if after.game.type is 1 and before.game.type is 0:
-                for role in after.roles:
-                    if role.name == 'Role-Streamer':
-                        msg = '{0} presents: "{1}"! <{2}>'.format(after, after.game.name, after.game.url)
-                        general = discord.utils.get(after.server.channels, name='general')
-                        await client.send_message(general, msg)
+    if before.game.type is not 1:
+        if after.game.type is 1:
+            for role in after.roles:
+                if role.name == 'Role-Streamer':
+                    msg = '{0} presents: "{1}"! <{2}>'.format(after, after.game.name, after.game.url)
+                    general = discord.utils.get(after.server.channels, name='general')
+                    await client.send_message(general, msg)
 
 @client.event
 async def on_message(message):
