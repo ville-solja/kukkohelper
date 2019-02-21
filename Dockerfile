@@ -1,12 +1,10 @@
 FROM python:3.6
 
 ADD kukkohelper.py  /
-ADD KEY /
-ADD TOKEN /
+ADD tokens/KEY /
+ADD tokens/TOKEN /
+ADD requirements.txt /
 
-RUN pip install --upgrade pip
-RUN pip install requests
-RUN pip install discord
 RUN apt-get update
 RUN apt-get install -y vim
 
