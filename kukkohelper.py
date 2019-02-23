@@ -3,10 +3,10 @@ import requests
 import sys
 import datetime
 from random import randint
-from lib.RepeatedTimer import RepeatedTimer
+from RepeatedTimer import RepeatedTimer
 
-TOKEN = open('./tokens/TOKEN', 'r').read().strip()
-KEY = open('./tokens/KEY', 'r').read().strip()
+TOKEN = open('TOKEN', 'r').read().strip()
+KEY = open('KEY', 'r').read().strip()
 
 emoji_checkmark = '✅'
 emoji_stop = '🛑'

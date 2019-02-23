@@ -1,11 +1,13 @@
 FROM python:3.6
 
 ADD kukkohelper.py  /
-ADD tokens/KEY /
-ADD tokens/TOKEN /
+ADD KEY /
+ADD TOKEN /
+ADD RepeatedTimer.py /
 ADD requirements.txt /
 
-RUN apt-get update
-RUN apt-get install -y vim
+RUN pip install -r requirements.txt
+#RUN apt-get update
+#RUN apt-get install -y vim
 
 CMD [ "python", "./kukkohelper.py" ]
