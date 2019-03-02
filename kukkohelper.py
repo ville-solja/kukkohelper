@@ -21,6 +21,8 @@ headers = {
 client = discord.Client()
 global streamers
 streamers = {}
+global list_of_invites
+list_of_invites = {}
 
 
 def user_recently_announced(name):
@@ -53,7 +55,6 @@ def prune_list(streamers):
                 del streamers[name]
             except RuntimeError:
                 pass
-            
 
 
 @client.event
@@ -61,8 +62,11 @@ async def on_ready():
     print('Logged in as')
     print(client.user.name)
     print(client.user.id)
-    for each in client.servers:
-        print(each.name)
+    for server in client.servers:
+        print(server.name)
+        invites = await client.invites_from(server)
+        for invite in invites:
+            list_of_invites.update({invite.id: {"uses": invite.uses}})
 
 
 @client.event
@@ -77,9 +81,30 @@ async def on_member_update(before, after):
                 if role.name == 'Role-Streamer':
                     print('{} passed to user_recently_announced'.format(after))
                     if user_recently_announced(after.name) is False:
-                        msg = '{0} presents: "{1}"! <{2}>'.format(after, after.game.name, after.game.url)
+                        public_msg = '{0} presents: "{1}"! <{2}>'.format(after, after.game.name, after.game.url)
                         general = discord.utils.get(after.server.channels, name='general')
-                        await client.send_message(general, msg)
+                        await client.send_message(general, public_msg)
+                        invite = await client.create_invite(after.server, max_age = 10800, temporary = True)
+                        private_msg = """Here is a link that can be shared with stream audience: {}""".format(invite)
+                        await client.send_message(after, private_msg)
+
+
+@client.event
+async def on_member_join(member):
+    current = await client.invites_from(member.server)
+    for invite_1 in current:
+        for invite_2_code, invite_2_uses in list_of_invites.items():
+            if invite_1.code == invite_2_code:
+                print("code match")
+                if invite_1.uses != invite_2_uses["uses"]:
+                    print("uses counter difference")
+                    print(invite_1.inviter)
+                    if 'Helper' in str(invite_1.inviter):
+                        print("Helper detected")
+                        watcher_role = discord.utils.get(member.server.roles, name='Role-Watcher')
+                        await client.add_roles(member, watcher_role)
+        list_of_invites.update({invite_1.code: {"uses": invite_1.uses}})
+    print(list_of_invites)
 
 
 @client.event
@@ -110,7 +135,7 @@ async def on_message(message):
         "!dota random" picks a random dota hero
         "!git" posts a link to the bots source
         """
-        await client.send_message(message.channel, msg)
+        await client.send_message(message.author, msg)
 
     if message.content.startswith('!list'):
         l = 'Here is a list of game roles:\n'
@@ -123,7 +148,7 @@ async def on_message(message):
             for r in s.roles:
                 if r.name.startswith('Role-'):
                     l += '{0}\n'.format(r.name[5:])
-        await client.send_message(message.channel, l)
+        await client.send_message(message.author, l)
 
     if message.content.startswith('!add'):
         flag = False
@@ -194,8 +219,8 @@ async def on_message(message):
     if message.content.startswith('!git'):
         msg = """Source for this bot can be found at:
         https://github.com/ville-solja/kukkohelper"""
-        await client.send_message(message.channel, msg)
+        await client.send_message(message.author, msg)
 
-RepeatedTimer(300, prune_list, streamers)
+RepeatedTimer(10800, prune_list, streamers) #  occurs every 3 hours
 
 client.run(TOKEN)
