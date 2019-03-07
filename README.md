@@ -34,9 +34,6 @@ _!remove streamer_
 
 ### !add <role>
 Command that allows user to add chosen role
-  
-## Installation
-For now just DM me as there's so many minor things that need adjusting in Discord's end before the bot actually functions correctly.
 
 _!add dota_
 _!add streamer_
@@ -46,3 +43,6 @@ Picks random hero from opendota API and then displays relevant data about that p
 
 ### !git
 Displays link to the bots source in git
+
+## Installation
+For now just DM me as there's so many minor things that need adjusting in Discord's end before the bot actually functions correctly.
