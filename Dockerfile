@@ -1,7 +1,7 @@
 FROM python
 ADD kukkohelper.py  /
-#ADD KEY /
-#ADD TOKEN /
+ADD KEY /
+ADD TOKEN /
 ADD RepeatedTimer.py /
 ADD requirements.txt /
 RUN pip install -r requirements.txt
