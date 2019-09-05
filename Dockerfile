@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python
 ADD kukkohelper.py  /
 #ADD KEY /
 #ADD TOKEN /
