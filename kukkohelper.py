@@ -1,12 +1,13 @@
 import discord
 import requests
 import sys
+import os
 import datetime
 from random import randint
 from RepeatedTimer import RepeatedTimer
 
-TOKEN = open('TOKEN', 'r').read().strip()
-KEY = open('KEY', 'r').read().strip()
+TOKEN = os.environ['TOKEN']
+KEY = os.environ['KEY']
 
 emoji_checkmark = '✅'
 azure_url_ext = "https://northeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=adult"
