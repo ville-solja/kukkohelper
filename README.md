@@ -1,14 +1,11 @@
-# kukkohelper
+# KukkoHelper
 
 ## General
-This discord bot is created originally for Kylmät Kukot game groups server in order to implement key features for the community.
+This discord bot is created originally for Kylmät Kukot game groups server in order to implement key features for the community. 
 
-### Streamer features
+## Streamer features
 #### Notification
 Users that have role Role-Streamer will have bot announce when they start streaming.
-
-#### Invite link
-Streamer receives DM from kukkohelper which contains a invite link to server. This invite link only grants temporary access to channels stream-chat & stream-voice. Original idea was that low view count streamers who aren't often looking at their twitch chat could invite the viewers to participate in VoIP chat. 
 
 ## Commands
 ### !help 
@@ -41,8 +38,30 @@ _!add streamer_
 ### !dota random
 Picks random hero from opendota API and then displays relevant data about that pick to the chat.
 
-### !git
-Displays link to the bots source in git
+### !wordcloud
+Creates a wordcloud from the current channel. Links/emojis/commands/short messages will be excluded. Picture will be then posted to that channel.
 
 ## Installation
-For now just DM me as there's so many minor things that need adjusting in Discord's end before the bot actually functions correctly.
+### Env variables for docker image
+#### Azure Key
+If you want to make use of the Azure cognitive services, you need to provide the access key for that as an environment variable
+
+Example: "KEY=key with length of 32 characters"
+
+Also make sure your cognitive services is using north europe URL:
+"https://northeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=adult"
+
+The URL will be later added as another optional environment variable 
+
+#### Discord bot token
+In order to provide access for the bot you need to provide it with the appropriate access token 
+
+Example: "TOKEN=token with length of 59 characters"
+
+Currently only the discord bot token is mandatory
+
+### Discord server setup
+#### NSFW -channel
+Make sure you have a channel for NSFW content (literally named "nsfw"), it will be only channel where posting that stuff is allowed.
+
+Original intent was that nsfw content would be reposted to the nsfw -channel, but it's not quite done yet.

@@ -5,9 +5,17 @@ import os
 import datetime
 from random import randint
 from RepeatedTimer import RepeatedTimer
+import matplotlib.pyplot as plt
+import io
+import re
+from wordcloud import WordCloud
 
-TOKEN = os.environ['TOKEN']
-KEY = os.environ['KEY']
+TOKEN = os.environ['TOKEN']    
+if os.environ.get('KEY') is not None:
+    KEY = os.environ['KEY']
+    AzureFilterEnabled = True
+else: 
+    AzureFilterEnabled = False
 
 emoji_checkmark = '✅'
 azure_url_ext = "https://northeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=adult"
@@ -18,7 +26,10 @@ headers = {
 client = discord.Client()
 global streamers
 streamers = {}
-list_of_songs = []
+wordlist = []
+link_pattern = re.compile('^http')
+emoji_pattern = re.compile('^:.*:$')
+cmd_pattern = re.compile('^!')
 
 def user_recently_announced(name):
     if name in streamers:
@@ -77,18 +88,19 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if len(message.attachments) > 0:
-        data = {'url': '{0}'.format(message.attachments[0].url)}
-        r = requests.post(azure_url_ext, json=data, headers=headers)
-        nsfwchannel = discord.utils.get(message.guild.channels, name='nsfw')
-        origchannel = message.channel
-        if r.json()['adult']['isAdultContent'] is True:
-            if origchannel is not nsfwchannel:
-                await message.delete()
-                msg = 'Image was deleted due to Adultscore: {0}.\nPlease repost to NSFW'.format(r.json()['adult']['adultScore'])
-                await origchannel.send(msg)
-        else:
-            await message.add_reaction(emoji_checkmark)
+    if AzureFilterEnabled == True:
+        if len(message.attachments) > 0:
+            data = {'url': '{0}'.format(message.attachments[0].url)}
+            r = requests.post(azure_url_ext, json=data, headers=headers)
+            nsfwchannel = discord.utils.get(message.guild.channels, name='nsfw')
+            origchannel = message.channel
+            if r.json()['adult']['isAdultContent'] is True:
+                if origchannel is not nsfwchannel:
+                    await message.delete()
+                    msg = 'Image was deleted due to Adultscore: {0}.\nPlease repost to NSFW'.format(r.json()['adult']['adultScore'])
+                    await origchannel.send(msg)
+            else:
+                await message.add_reaction(emoji_checkmark)
 
     if message.content.startswith('!help'):
         msg = """This bot will help you find people to play games with!
@@ -188,4 +200,31 @@ async def on_message(message):
                                                                              r.json()[rand]["legs"])
         await message.channel.send(msg)
 
+    if message.content.startswith('!wordcloud'):
+        async for message in message.channel.history(limit=None):
+            if re.match(cmd_pattern, message.content) is not None:
+                print('this is a command')
+            else:
+                message_as_list = message.content.split()
+                print(message_as_list)
+                for word in message_as_list:
+                    print(word)
+                    if len(word) < 4:
+                        print('this is too short')
+                    elif re.match(link_pattern, word) is not None:
+                        print('this is a link')
+                    elif re.match(emoji_pattern, word) is not None:
+                        print('this is a emoji')
+                    else:
+                        wordlist.append(word)    
+        print(wordlist)  
+        wordlist_str = ' '.join(wordlist)
+        wordcloud = WordCloud(max_font_size=40, background_color='black').generate(wordlist_str)
+        plt.figure()
+        plt.imshow(wordcloud, interpolation="bilinear")
+        plt.axis("off")
+        image = io.BytesIO() 
+        plt.savefig(image, transparent=True, format='png')
+        image.seek(0)
+        await message.channel.send(content= "Tässä hieno wordcloud", file=discord.File(image, 'image.png'))
 client.run(TOKEN)
