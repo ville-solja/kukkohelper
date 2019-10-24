@@ -14,15 +14,15 @@ TOKEN = os.environ['TOKEN']
 if os.environ.get('KEY') is not None:
     KEY = os.environ['KEY']
     AzureFilterEnabled = True
+    headers = {
+        "Content-Type": "application/json",
+        "Ocp-Apim-Subscription-Key": KEY
+    }
+    azure_url_ext = "https://northeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=adult"
 else: 
     AzureFilterEnabled = False
 
 emoji_checkmark = '✅'
-azure_url_ext = "https://northeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=adult"
-headers = {
-    "Content-Type": "application/json",
-    "Ocp-Apim-Subscription-Key": KEY
-}
 client = discord.Client()
 global streamers
 streamers = {}
@@ -106,10 +106,10 @@ async def on_message(message):
         msg = """This bot will help you find people to play games with!
         Commands:
         "!help" displays this message
-        "!list" shows all available games
-        "!add <role>" adds you to chosen role
-        "!remove <role>" removes role if you have it
-        "!dota random" picks a random dota hero
+        "!list" shows all available roles that can be used with add/remove
+        "!add <role>" adds you to chosen role. Example: !add dota
+        "!remove <role>" removes role if you have it. Example !remove dota
+        "!dota random" picks a random dota hero from Opendota API
         """
         await message.author.send(msg)
 
