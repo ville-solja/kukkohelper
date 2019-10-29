@@ -92,13 +92,12 @@ async def on_message(message):
         if len(message.attachments) > 0:
             data = {'url': '{0}'.format(message.attachments[0].url)}
             r = requests.post(azure_url_ext, json=data, headers=headers)
-            nsfwchannel = discord.utils.get(message.guild.channels, name='nsfw')
-            origchannel = message.channel
+            #nsfwchannel = discord.utils.get(message.guild.channels, name='nsfw')
             if r.json()['adult']['isAdultContent'] is True:
-                if origchannel is not nsfwchannel:
+                if message.channel.is_nsfw() is False:
                     await message.delete()
                     msg = 'Image was deleted due to Adultscore: {0}.\nPlease repost to NSFW'.format(r.json()['adult']['adultScore'])
-                    await origchannel.send(msg)
+                    await message.channel.send(msg)
             else:
                 await message.add_reaction(emoji_checkmark)
 
@@ -110,6 +109,7 @@ async def on_message(message):
         "!add <role>" adds you to chosen role. Example: !add dota
         "!remove <role>" removes role if you have it. Example !remove dota
         "!dota random" picks a random dota hero from Opendota API
+        "!wordcloud" creates a wordcloud from that channels message history
         """
         await message.author.send(msg)
 

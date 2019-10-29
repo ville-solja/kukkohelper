@@ -7,6 +7,12 @@ This discord bot is created originally for Kylmät Kukot game groups server in o
 #### Notification
 Users that have role Role-Streamer will have bot announce when they start streaming.
 
+## NSFW -filter
+* User posts an image attachment
+* Attachment url is sent to Azure cognitive services, if it's NSFW process continues
+* Channel is checked for nsfw status, if it safe for work (As in the status NSFW is not enabled)
+* Image is removed with the cognitive services score and a recommendation to post it to an NSFW channel
+
 ## Commands
 ### !help 
 Displays a general list of available commands and brief usage tips as DM
@@ -59,9 +65,3 @@ In order to provide access for the bot you need to provide it with the appropria
 Example: "TOKEN=token with length of 59 characters"
 
 Currently only the discord bot token is mandatory
-
-### Discord server setup
-#### NSFW -channel
-Make sure you have a channel for NSFW content (literally named "nsfw"), it will be only channel where posting that stuff is allowed.
-
-Original intent was that nsfw content would be reposted to the nsfw -channel, but it's not quite done yet.
