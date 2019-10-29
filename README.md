@@ -9,9 +9,12 @@ Users that have role Role-Streamer will have bot announce when they start stream
 
 ## NSFW -filter
 * User posts an image attachment
-* Attachment url is sent to Azure cognitive services, if it's NSFW process continues
-* Channel is checked for nsfw status, if it safe for work (As in the status NSFW is not enabled)
-* Image is removed with the cognitive services score and a recommendation to post it to an NSFW channel
+.gif is not currently supported and link previews are not checked either
+* Attachment url is sent to Azure cognitive services
+If it's NSFW process continues
+* Channel is checked for nsfw status
+If it safe for work (As in the status NSFW is not enabled) process continues
+* Image is removed from the channel and it's NSFW rating is posted instead
 
 ## Commands
 ### !help 
@@ -20,14 +23,11 @@ Displays a general list of available commands and brief usage tips as DM
 ### !list
 List roles available for users as DM. Crucial part of !add command 
 
-Includes commands for:
-*Games
-*Members
-**Users who want to stick around and avoid prune
-*Streamers
-**Users who want to inform others when they go online
-*Developers
-**Users who are interested in viewing the test -channel and it's contents. Discuss with author regarding possibility of additional things to do.
+Includes:
+* Games (Based on current roles created)
+* Members (Users who want to stick around and avoid prune)
+* Streamers (Users who want to inform others when they go online)
+* Developers (Users who are interested in viewing the test -channel and it's contents)
 
 ### !remove <role>
 Command that allows user to remove chosen role
@@ -56,8 +56,6 @@ Example: "KEY=key with length of 32 characters"
 
 Also make sure your cognitive services is using north europe URL:
 "https://northeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=adult"
-
-The URL will be later added as another optional environment variable 
 
 #### Discord bot token
 In order to provide access for the bot you need to provide it with the appropriate access token 

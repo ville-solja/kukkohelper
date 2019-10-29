@@ -92,7 +92,6 @@ async def on_message(message):
         if len(message.attachments) > 0:
             data = {'url': '{0}'.format(message.attachments[0].url)}
             r = requests.post(azure_url_ext, json=data, headers=headers)
-            #nsfwchannel = discord.utils.get(message.guild.channels, name='nsfw')
             if r.json()['adult']['isAdultContent'] is True:
                 if message.channel.is_nsfw() is False:
                     await message.delete()
