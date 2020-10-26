@@ -2,16 +2,18 @@ import discord
 import requests
 import sys
 import os
-import datetime
+from datetime import datetime
 from random import randint
-from RepeatedTimer import RepeatedTimer
 import matplotlib.pyplot as plt
 import io
 import re
 from wordcloud import WordCloud
 
 TOKEN = os.environ['TOKEN']    
-if os.environ.get('KEY') is not None:
+#TOKEN = '<Insert token for local testing>'
+KEY = os.environ.get('KEY')
+#KEY = None 
+if KEY is not None:
     KEY = os.environ['KEY']
     AzureFilterEnabled = True
     headers = {
@@ -24,65 +26,23 @@ else:
 
 emoji_checkmark = '✅'
 client = discord.Client()
-global streamers
-streamers = {}
 wordlist = []
 link_pattern = re.compile('^http')
 emoji_pattern = re.compile('^:.*:$')
 cmd_pattern = re.compile('^!')
 
-def user_recently_announced(name):
-    if name in streamers:
-        print("name found in list, do additional steps")
-        return True
-    else:
-        print("name not found in list")
-        now = datetime.datetime.now()
-        add_to_list(name, now)
-        return False
-
-
-def add_to_list(name, now):
-    print("streamer added: {0}".format(name))
-    streamers.update({name: {"time": now}})
-
-
-def prune_list(streamers):
-    print("prune_list called")
-    print(streamers)
-    for name, value in streamers.items():
-        print(name)
-        print(value)
-        print(value["time"])
-        compare = (datetime.datetime.now() - value["time"]).total_seconds()
-        if compare > 3600:
-            print("Will prune user {0} from list".format(name))
-            try:
-                del streamers[name]
-            except RuntimeError:
-                pass
-
 @client.event
 async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
+    print('{} bot started'.format(
+        datetime.now().strftime("%d.%m.%Y, %H:%M:%S")))
+    print('Client Name: {}'.format(
+        client.user.name))
+    print('Client ID: {}'.format(
+        client.user.id))
     for guild in client.guilds:
-        print(guild.name)
+        print('Guild: {}'.format(
+            guild.name))
     
-@client.event
-async def on_member_update(before, after):
-    print(after.activity)
-    for activity in after.activities:
-        if activity.type == discord.ActivityType.streaming:
-            for role in after.roles:
-                if role.name == 'Role-Streamer':
-                    print('{} passed to user_recently_announced'.format(after))
-                    if user_recently_announced(after.name) is False:
-                        public_msg = '{0} presents: "{1}"! <{2}>'.format(after.name, activity.name, activity.url)
-                        general = discord.utils.get(after.guild.channels, name='general')
-                        await general.send(public_msg)
-
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -95,10 +55,15 @@ async def on_message(message):
             if r.json()['adult']['isAdultContent'] is True:
                 if message.channel.is_nsfw() is False:
                     await message.delete()
-                    msg = 'Image was deleted due to Adultscore: {0}.\nPlease repost to NSFW'.format(r.json()['adult']['adultScore'])
+                    msg = 'Image was deleted due to Adultscore: {0}.\nPlease repost to NSFW'.format(
+                        r.json()['adult']['adultScore'])
+                    print('{} Image deleted due to NSFW score of {} from {}'.format(
+                        datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), 
+                        r.json()['adult']['adultScore'], 
+                        message.channel.name))
                     await message.channel.send(msg)
             else:
-                await message.add_reaction(emoji_checkmark)
+                await message.add_reaction(emoji_checkmark)      
 
     if message.content.startswith('!help'):
         msg = """This bot will help you find people to play games with!
@@ -110,6 +75,9 @@ async def on_message(message):
         "!dota random" picks a random dota hero from Opendota API
         "!wordcloud" creates a wordcloud from that channels message history
         """
+        print('{} help requested by {}'.format(
+            datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), 
+            message.author))
         await message.author.send(msg)
 
     if message.content.startswith('!list'):
@@ -123,6 +91,9 @@ async def on_message(message):
             for r in s.roles:
                 if r.name.startswith('Role-'):
                     l += '{0}\n'.format(r.name[5:])
+        print('{} role list requested by {}'.format(
+            datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), 
+            message.author))
         await message.author.send(l)
 
     if message.content.startswith('!add'):
@@ -148,6 +119,9 @@ async def on_message(message):
                                 await message.channel.send(msg)
                                 flag = True
                             else:
+                                print('{} role addded requested by {}'.format(
+                                    datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), 
+                                    message.author))
                                 await member.add_roles(role)
                                 await message.add_reaction(emoji_checkmark)
                                 flag = True
@@ -177,6 +151,9 @@ async def on_message(message):
                     if role.name.startswith('Role-'):
                         if str(role.name[5:]).lower() == str(message.content[8:]).lower():
                             if discord.utils.get(member.roles, id=role.id) is not None:
+                                print('{} role removed requested by {}'.format(
+                                    datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), 
+                                    message.author))
                                 await member.remove_roles(role)
                                 await message.add_reaction(emoji_checkmark)
                                 flag = True
@@ -197,9 +174,15 @@ async def on_message(message):
         msg = """You're going to play {0} a {1} hero with {2} legs""".format(r.json()[rand]["localized_name"],
                                                                              r.json()[rand]["primary_attr"],
                                                                              r.json()[rand]["legs"])
+        print('{} random dota hero requested by {}'.format(
+            datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), 
+            message.author))
         await message.channel.send(msg)
 
     if message.content.startswith('!wordcloud'):
+        print('{} wordcloud requested by {}'.format(
+            datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), 
+            message.author))
         async for message in message.channel.history(limit=None):
             if re.match(cmd_pattern, message.content) is not None:
                 print('this is a command')
@@ -207,7 +190,6 @@ async def on_message(message):
                 message_as_list = message.content.split()
                 print(message_as_list)
                 for word in message_as_list:
-                    print(word)
                     if len(word) < 4:
                         print('this is too short')
                     elif re.match(link_pattern, word) is not None:
@@ -216,7 +198,6 @@ async def on_message(message):
                         print('this is a emoji')
                     else:
                         wordlist.append(word)    
-        print(wordlist)  
         wordlist_str = ' '.join(wordlist)
         wordcloud = WordCloud(max_font_size=40, background_color='black').generate(wordlist_str)
         plt.figure()
@@ -225,5 +206,8 @@ async def on_message(message):
         image = io.BytesIO() 
         plt.savefig(image, transparent=True, format='png')
         image.seek(0)
+        print('{} wordcloud completed for {}'.format(
+            datetime.now().strftime("%d.%m.%Y, %H:%M:%S"), 
+            message.author))
         await message.channel.send(content= "Tässä hieno wordcloud", file=discord.File(image, 'image.png'))
 client.run(TOKEN)

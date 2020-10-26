@@ -3,10 +3,6 @@
 ## General
 This discord bot is created originally for Kylmät Kukot game groups server in order to implement key features for the community. 
 
-## Streamer features
-#### Notification
-Users that have role Role-Streamer will have bot announce when they start streaming.
-
 ## NSFW -filter
 * User posts an image attachment
 .gif is not currently supported and link previews are not checked either
