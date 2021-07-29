@@ -14,10 +14,10 @@ If it safe for work (As in the status NSFW is not enabled) process continues
 
 ## Commands
 ### !help 
-Displays a general list of available commands and brief usage tips as DM
+Displays a general list of available commands and brief usage tips
 
 ### !list
-List roles available for users as DM. Crucial part of !add command 
+List roles available for users. Crucial part of !add command 
 
 Includes:
 * Games (Based on current roles created)
@@ -25,23 +25,20 @@ Includes:
 * Streamers (Users who want to inform others when they go online)
 * Developers (Users who are interested in viewing the test -channel and it's contents)
 
-### !remove <role>
+### !quit <role>
 Command that allows user to remove chosen role
 
 _!remove dota_
 _!remove streamer_
 
-### !add <role>
+### !join <role>
 Command that allows user to add chosen role
 
 _!add dota_
 _!add streamer_
 
-### !dota random
+### !dota_random
 Picks random hero from opendota API and then displays relevant data about that pick to the chat.
-
-### !wordcloud
-Creates a wordcloud from the current channel. Links/emojis/commands/short messages will be excluded. Picture will be then posted to that channel.
 
 ## Installation
 ### Env variables for docker image
