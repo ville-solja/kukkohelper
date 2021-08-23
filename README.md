@@ -14,48 +14,13 @@ If it safe for work (As in the status NSFW is not enabled) process continues
 
 ## Commands
 ### !help 
-Displays a general list of available commands and brief usage tips as DM
-
-### !list
-List roles available for users as DM. Crucial part of !add command 
-
-Includes:
-* Games (Based on current roles created)
-* Members (Users who want to stick around and avoid prune)
-* Streamers (Users who want to inform others when they go online)
-* Developers (Users who are interested in viewing the test -channel and it's contents)
-
-### !remove <role>
-Command that allows user to remove chosen role
-
-_!remove dota_
-_!remove streamer_
-
-### !add <role>
-Command that allows user to add chosen role
-
-_!add dota_
-_!add streamer_
-
-### !dota random
-Picks random hero from opendota API and then displays relevant data about that pick to the chat.
-
-### !wordcloud
-Creates a wordcloud from the current channel. Links/emojis/commands/short messages will be excluded. Picture will be then posted to that channel.
+Displays a general list of available commands and brief usage tips
 
 ## Installation
-### Env variables for docker image
-#### Azure Key
-If you want to make use of the Azure cognitive services, you need to provide the access key for that as an environment variable
+### Env variables
+* TOKEN -> Your Discord bot token
+* KEY -> Your Azure key
+* AZURE_URL_EXT -> Your Azure cloud URL, for example https://northeurope.api.cognitive.microsoft.com/vision/v3.2/analyze?visualFeatures=Adult&language=en&model-version=latest
+* COMMAND_PREFIX -> Bot command prefix'
 
-Example: "KEY=key with length of 32 characters"
-
-Also make sure your cognitive services is using north europe URL:
-"https://northeurope.api.cognitive.microsoft.com/vision/v1.0/analyze?visualFeatures=adult"
-
-#### Discord bot token
-In order to provide access for the bot you need to provide it with the appropriate access token 
-
-Example: "TOKEN=token with length of 59 characters"
-
-Currently only the discord bot token is mandatory
+Currently only the discord bot token is mandatory.
