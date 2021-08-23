@@ -22,7 +22,7 @@ secrets["azure_headers"] = None
 
 ## Bot
 conf["command_prefix"] = "!"
-conf["initial_extensions"] = ["cock-user", "dota"]
+conf["initial_extensions"] = ["general", "dota"]
 
 ############################################## END DEFAULT SETTINGS ##############################################
 

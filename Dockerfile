@@ -1,7 +1,7 @@
 FROM python
 ADD kukkohelper.py /
 ADD dota.py /
-ADD cock-user.py /
+ADD general.py /
 ADD setup_logger.py /
 ADD requirements.txt /
 RUN pip install -r requirements.txt
