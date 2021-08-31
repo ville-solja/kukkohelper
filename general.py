@@ -29,7 +29,7 @@ class general_helper(commands.Cog):
     async def ping(self, ctx):
         logger.info("command ping called")
         ##if(active()):
-        await ctx.send("Pong! Bot functions online")
+        await ctx.send(f"Pong! {round(self.bot.latency * 1000)} ms.")
         ##else:
            ## await ctx.send("Bot functions currently offline.")
 
@@ -45,14 +45,17 @@ class general_helper(commands.Cog):
             group = group.lower()
             role = discord.utils.get(ctx.guild.roles, name = group)
             if (role == None):
-                await ctx.send("Club not found. Please note that name is case sensitive.")
+                #await ctx.send("Club not found. Please note that name is case sensitive.")
                 logger.info("Group " + group + " not found on server.")
+                await ctx.message.add_reaction(self.bot.conf["emoji_nok"])
             else:
                 await member.add_roles(role)
                 logger.info("Added " + str(ctx.message.author) + " to group " + str(role))
-                await ctx.send("I added you to group " + str(role))
+                await ctx.message.add_reaction(self.bot.conf["emoji_checkmark"])
+                #await ctx.send("I added you to group " + str(role))
         else:
-            await ctx.send("You can only add groups with club- prefix currently.")
+            #await ctx.send("You can only add groups with club- prefix currently.")
+            await ctx.message.add_reaction(self.bot.conf["emoji_nok"])
 
     @commands.command(name="quit", brief= "Leave a club.", help = "Leave a group/club.")
     async def quit(self, ctx, group):
@@ -64,10 +67,12 @@ class general_helper(commands.Cog):
         if(role in member.roles):
             await member.remove_roles(role)
             logger.info("Deleted role " + str(role) + " from " + str(member))
-            await ctx.send("I removed you from " + str(role))
+            await ctx.message.add_reaction(self.bot.conf["emoji_checkmark"])
+            #await ctx.send("I removed you from " + str(role))
         else:
             logger.info("Role " + str(role) + " not found for user " + str(member))
-            await ctx.send("Could not find you in " + group)
+            #await ctx.send("Could not find you in " + group)
+            await ctx.message.add_reaction(self.bot.conf["emoji_nok"])
 
     @commands.command(name="list", brief = "List clubs.")
     async def list(self, ctx):
@@ -96,11 +101,14 @@ class general_helper(commands.Cog):
                 overwrites = {guild.default_role: discord.PermissionOverwrite(read_messages=False)}
                 category = discord.utils.get(ctx.guild.categories, name = "CLUBS")
                 await guild.create_text_channel(group, overwrites = overwrites, category = category)
-                await ctx.send("Club " + group + " created for you! Use !list and !join to join now.")
+                await ctx.message.add_reaction(self.bot.conf["emoji_checkmark"])
+                #await ctx.send("Club " + group + " created for you! Use !list and !join to join now.")
             else:
-                await ctx.send("Club exist already dumkopf.")
+                #await ctx.send("Club exist already dumkopf.")
+                await ctx.message.add_reaction(self.bot.conf["emoji_nok"])
         else:
-            await ctx.send("Club name must have club- prefix. Try again nakkisormi.")  
+            #await ctx.send("Club name must have club- prefix. Try again nakkisormi.")  
+            await ctx.message.add_reaction(self.bot.conf["emoji_nok"])
 
     @commands.command(name="delete_club", aliases=["del_club", "dc"], brief = "Delete existing club.", help = "Use carefully.")
     async def delete_club(self, ctx, group):
@@ -117,9 +125,11 @@ class general_helper(commands.Cog):
             if (role != None):
                 logger.info("delete role " + role.name)
                 await role.delete()
-            await ctx.send("All done.")
+            await ctx.message.add_reaction(self.bot.conf["emoji_checkmark"])
+            #await ctx.send("All done.")
         else:
-            await ctx.send("Don't try any funny business! Only channels with club- prefix can be deleted.")
+            #await ctx.send("Don't try any funny business! Only channels with club- prefix can be deleted.")
+            await ctx.message.add_reaction(self.bot.conf["emoji_nok"])
 
 def setup(bot):
     bot.add_cog(general_helper(bot))
