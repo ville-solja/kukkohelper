@@ -11,12 +11,12 @@ secrets = dict()
 
 ############################################## DEFAULT SETTINGS ##############################################
 ## General
-conf["settings_file"] = "/config/config.toml"
 secrets["token"] = None
 
 ## Azure
 conf["azurefilter"] = True
 conf["emoji_checkmark"] = "✅"
+conf["emoji_nok"] = "❌"
 secrets["azure_url_ext"] = None
 secrets["azure_headers"] = None
 
@@ -38,6 +38,10 @@ def load_env():
         secrets["azure_headers"] = {"Content-Type": "application/json", "Ocp-Apim-Subscription-Key": os.environ["KEY"]}
     if("COMMAND_PREFIX" in os.environ):
         conf["command_prefix"] = os.environ["COMMAND_PREFIX"]
+    if("CLUB_CAT" in os.environ):
+        conf["club_cat"] = os.environ["CLUB_CAT"]
+    if("ARCHIVE_CAT" in os.environ):
+        conf["archive_cat"] = os.environ["ARCHIVE_CAT"]
 
 def azure_request(azure_url, json, headers):
     response = requests.post(azure_url, json = json, headers = headers)
@@ -87,8 +91,8 @@ async def on_message(message):
                     await message.channel.send(msg)
             else:
                 logger.warning("Failed to fetch NFSW rating, status: " + tuomio)
-                msg = "Could not get NSFW rating!"
-                await message.channel.send(msg)
+                await message.add_reaction(bot.conf["emoji_nok"])
+                
     await bot.process_commands(message)
 
 ############################################## END BOT EVENTS ##############################################
@@ -113,6 +117,8 @@ async def nsfw_switch(ctx, toggle):
 ############################################## END BOT COMMANDS ##############################################
 
 ## Run
+bot.conf = dict()
+bot.conf = conf
 for ext in conf["initial_extensions"]:
     bot.load_extension(ext)
 bot.run(secrets["token"])
