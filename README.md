@@ -18,9 +18,12 @@ Displays a general list of available commands and brief usage tips
 
 ## Installation
 ### Env variables
-* TOKEN -> Your Discord bot token
-* KEY -> Your Azure key
-* AZURE_URL_EXT -> Your Azure cloud URL, for example https://northeurope.api.cognitive.microsoft.com/vision/v3.2/analyze?visualFeatures=Adult&language=en&model-version=latest
-* COMMAND_PREFIX -> Bot command prefix'
+* token -> Your Discord bot token
+* azure_key -> Your Azure key
+* azure_url_ext -> Your Azure cloud URL, for example https://northeurope.api.cognitive.microsoft.com/vision/v3.2/analyze?visualFeatures=Adult&language=en&model-version=latest
+* command_prefix -> Bot command prefix'
 
-Currently only the discord bot token is mandatory.
+Currently only the discord bot token is mandatory. NSFW filter is ON by default. Turn it off in kukkobot.py if you don't plan on using it.
+
+## Adding cogs / for devs
+Bot loads all env variables to conf[] dictionary, so you can add your own easily. Add new cogs to default_conf["initial_extensions"] in kukkobot.py.

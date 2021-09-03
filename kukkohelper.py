@@ -1,55 +1,39 @@
 import os
 from discord.ext import commands
-from datetime import datetime
-import requests
 from random import randint
 from setup_logger import logger
 
 ## global variables
+default_conf = dict()
 conf = dict()
-secrets = dict()
+commands_called = 0
 
 ############################################## DEFAULT SETTINGS ##############################################
 ## General
-secrets["token"] = None
+default_conf["token"] = None
 
 ## Azure
-conf["azurefilter"] = True
-conf["emoji_checkmark"] = "✅"
-conf["emoji_nok"] = "❌"
-secrets["azure_url_ext"] = None
-secrets["azure_headers"] = None
+default_conf["azurefilter"] = False
+default_conf["emoji_ok"] = "✅"
+default_conf["emoji_nok"] = "❌"
+default_conf["azure_url_ext"] = None
+default_conf["azure_key"] = None
 
 ## Bot
-conf["command_prefix"] = "!"
-conf["initial_extensions"] = ["general", "dota"]
+default_conf["command_prefix"] = "!"
+default_conf["initial_extensions"] = ["general", "dota", "archive", "nsfw", "stats"]
+default_conf["clubs_category"] = "CLUBS"
+default_conf["archive_category"] = "ARCHIVE"
+default_conf["club_prefix"] = "club-"
 
 ############################################## END DEFAULT SETTINGS ##############################################
 
 # Load environment variables
 def load_env():
-    global secrets
     global conf
-    if("TOKEN" in os.environ):
-        secrets["token"] = os.environ["TOKEN"]
-    if("AZURE_URL_EXT" in os.environ):
-        secrets["azure_url_ext"] = os.environ["AZURE_URL_EXT"]
-    if("KEY" in os.environ):
-        secrets["azure_headers"] = {"Content-Type": "application/json", "Ocp-Apim-Subscription-Key": os.environ["KEY"]}
-    if("COMMAND_PREFIX" in os.environ):
-        conf["command_prefix"] = os.environ["COMMAND_PREFIX"]
-    if("CLUB_CAT" in os.environ):
-        conf["club_cat"] = os.environ["CLUB_CAT"]
-    if("ARCHIVE_CAT" in os.environ):
-        conf["archive_cat"] = os.environ["ARCHIVE_CAT"]
-
-def azure_request(azure_url, json, headers):
-    response = requests.post(azure_url, json = json, headers = headers)
-    try:
-        response.raise_for_status()
-    except requests.exceptions.HTTPError as e:
-        return str(response)
-    return response.json()['adult']['isAdultContent']
+    global default_conf
+    conf = default_conf | os.environ
+    print(conf)
 
 ## Initialize
 load_env()
@@ -69,56 +53,12 @@ async def on_command_error(ctx, error):
         return
     raise error
 
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    if(conf["azurefilter"] == True):
-        if len(message.attachments) > 0:
-            json = {'url': '{0}'.format(message.attachments[0].url)}
-            logger.debug("Azure request: " + secrets["azure_url_ext"] + "\n" + str(json) + "\n" + str(secrets["azure_headers"]))
-
-            tuomio = azure_request(secrets["azure_url_ext"], json, secrets["azure_headers"])
-            if(tuomio is False):
-                await message.add_reaction(conf["emoji_checkmark"])
-                
-
-            elif(tuomio == True and message.channel.is_nsfw() is False):
-                    await message.delete()
-                    msg = 'Image was deleted due to high Adultscore\nPlease repost to NSFW'
-                    logger.info("NSFW image deleted")
-                    await message.channel.send(msg)
-            else:
-                logger.warning("Failed to fetch NFSW rating, status: " + tuomio)
-                await message.add_reaction(bot.conf["emoji_nok"])
-                
-    await bot.process_commands(message)
-
 ############################################## END BOT EVENTS ##############################################
-
-################################################ BOT COMMANDS ##############################################
-@bot.command(name="nfsw_switch", help="Turn nfsw check <on/off>.")
-async def nsfw_switch(ctx, toggle):
-    logger.info("Command nfsw_switch called")
-    global conf
-    if(toggle == "on"):
-        conf["azurefilter"] = True
-        logger.info("set Azurefilter = True")
-        await ctx.send("Nfsw filtering now active")
-    elif(toggle == "off"):
-        conf["azurefilter"] = False
-        logger.info("Set azurefilter = False")
-        await ctx.send("Nfsw filtering now inactive")
-    else:
-        logger.info("Invalid argument supplied")
-        await ctx.send("Invalid argument supplied, please use !nfsw_switch <on/off>")
-
-############################################## END BOT COMMANDS ##############################################
 
 ## Run
 bot.conf = dict()
 bot.conf = conf
+bot.commands_called = commands_called
 for ext in conf["initial_extensions"]:
     bot.load_extension(ext)
-bot.run(secrets["token"])
+bot.run(conf["token"])
