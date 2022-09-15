@@ -1,6 +1,6 @@
 import os
+import discord
 from discord.ext import commands
-from random import randint
 from setup_logger import logger
 
 ## global variables
@@ -21,10 +21,11 @@ default_conf["azure_key"] = None
 
 ## Bot
 default_conf["command_prefix"] = "!"
-default_conf["initial_extensions"] = ["general", "dota", "archive", "nsfw", "stats"]
+default_conf["initial_extensions"] = ["general", "dota", "club"]
 default_conf["clubs_category"] = "CLUBS"
 default_conf["archive_category"] = "ARCHIVE"
 default_conf["club_prefix"] = "club-"
+default_conf["club_delete_role"] = "club-admin"
 
 ############################################## END DEFAULT SETTINGS ##############################################
 
@@ -37,7 +38,7 @@ def load_env():
 
 ## Initialize
 load_env()
-bot = commands.Bot(command_prefix=conf["command_prefix"])
+bot = discord.Bot(debug_guilds=[869884365381959730], intents=discord.Intents.default())
 
 ############################################## BOT EVENTS ##############################################
 ## Initial status

@@ -1,5 +1,4 @@
-discord.py
+py-cord
 requests
-wordcloud
 matplotlib
 toml

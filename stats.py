@@ -16,6 +16,7 @@ class stats_helper(commands.Cog):
         seconds = seconds % 60
         return '%0.2d:%02d:%02d' % (hours, minutes, seconds)
         
+    @bot.slash_commands()
 
     @commands.command(name="bot_stats", aliases = ["stats"], brief = "Show interesting stats.")
     async def stats(self, ctx):
