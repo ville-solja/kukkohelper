@@ -38,7 +38,7 @@ def load_env():
 
 ## Initialize
 load_env()
-bot = discord.Bot(debug_guilds=[869884365381959730], intents=discord.Intents.default())
+bot = discord.Bot(intents=discord.Intents.default())
 
 ############################################## BOT EVENTS ##############################################
 ## Initial status
